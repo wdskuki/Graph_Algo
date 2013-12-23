@@ -5,15 +5,16 @@ using namespace std;
 #define INFINITE 999999
 #define NIL -1
 
-class BFS{
+class DFS{
 public:
 	int n;// node num in the Graph
 	int **adj; // node relation
-	
+	int my_time; // time 
 	enum Color{WHITE, GRAY, BLACK};
 	struct Node{
 		Color clr;
 		int d;
+		int f;
 		int pi;
 	} *node; // node struct
 
@@ -36,37 +37,41 @@ public:
 		while(fscanf(fi, "%d%d",&v1, &v2) != EOF)
 			adj[v1][v2] = 1;		
 
+		my_time = 0;
 		fclose(fi);
 
 	}
 
-	void bfs(int s){
+
+	void dfs(){
 		for(int i = 0; i < n; i++){
 			node[i].clr = WHITE;
-			node[i].d = INFINITE;
 			node[i].pi = NIL;
 		}
-		node[s].clr = GRAY;
-		node[s].d = 0;
-		node[s].pi = NIL;
+		
+		my_time = 0;
 
-		queue<int> Q;
-		Q.push(s);
-		while(!Q.empty()){
-			int u = Q.front();
-			Q.pop();
-			for(int v = 0; v < n; v++){
-				if(adj[u][v] == 0)
-					continue;
-				if(node[v].clr == WHITE){
-					node[v].clr = GRAY;
-					node[v].d = node[u].d + 1;
-					node[v].pi = u;
-					Q.push(v);
-				}
-			}
-			node[u].clr = BLACK;
+		for(int i = 0; i < n; i++){
+			if(node[i].clr == WHITE)
+				dfs_visit(i);
 		}
+
+	}
+	void dfs_visit(int u){
+		my_time = my_time + 1;
+		node[u].d = my_time;
+		node[u].clr = GRAY;
+		for(int v = 0; v < n; v++){
+			if(adj[u][v] == 0)
+				continue;
+			if(node[v].clr == WHITE){
+				node[v].pi = u;
+				dfs_visit(v);
+			}
+		}
+		node[u].clr = BLACK;
+		my_time = my_time + 1;
+		node[u].f = my_time;
 	}
 	void clean(){
 		delete [] node;
@@ -87,6 +92,7 @@ public:
 			cout<<"node: "<<i<<"\t"
 				<<"Color: "<<node[i].clr<<"\t"
 				<<"d: "<<node[i].d<<"\t"
+				<<"f: "<<node[i].f<<"\t"
 				<<"pi: "<<node[i].pi<<endl;
 	}
 };
@@ -94,10 +100,10 @@ public:
 
 int main(int argc, char const *argv[])
 {
-	BFS b;
-	b.init();
-	b.bfs(1);
-	b.print();
-	b.clean();
+	DFS d;
+	d.init();
+	d.dfs();
+	d.print();
+	d.clean();
 	return 0;
 }
