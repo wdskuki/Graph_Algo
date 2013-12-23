@@ -77,8 +77,8 @@ public:
 		delete [] node;
 
 		for(int i = 0; i < n; i++)
-			delete adj[i];
-		delete adj;
+			delete []adj[i];
+		delete []adj;
 	}
 	void print_adj(){
 		for(int i = 0; i < n; i++){

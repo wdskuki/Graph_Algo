@@ -1,19 +1,21 @@
-#include <queue>
+//consider in undirected Graph
+
+#include <list>
 #include <iostream>
+#include <algorithm>
 using namespace std;
 #include <stdio.h>
 #define INFINITE 999999
 #define NIL -1
 
-class BFS{
+class Prim{
 public:
 	int n;// node num in the Graph
 	int **adj; // node relation
-	
-	enum Color{WHITE, GRAY, BLACK};
+
 	struct Node{
-		Color clr;
-		int d;
+		int id;
+		int key;
 		int pi;
 	} *node; // node struct
 
@@ -32,42 +34,53 @@ public:
 			for(int j = 0; j < n; j++)
 				adj[i][j] = 0;
 
-		int v1, v2;
-		while(fscanf(fi, "%d%d",&v1, &v2) != EOF)
-			adj[v1][v2] = 1;		
+		int v1, v2, w;
+		while(fscanf(fi, "%d%d%d",&v1, &v2, &w) != EOF){
+			adj[v1][v2] = w;
+			adj[v2][v1] = w;
+		}		
 
 		fclose(fi);
 
 	}
 
-	void bfs(int s){
+	void prim(int r){
 		for(int i = 0; i < n; i++){
-			node[i].clr = WHITE;
-			node[i].d = INFINITE;
+			node[i].key = INFINITE;
 			node[i].pi = NIL;
+			node[i].id = i;
 		}
-		node[s].clr = GRAY;
-		node[s].d = 0;
-		node[s].pi = NIL;
-
-		queue<int> Q;
-		Q.push(s);
+		node[r].key = 0;
+		list< Node* > Q;
+		for(int i = 0; i < n; i++) 
+			Q.push_back(&node[i]);
 		while(!Q.empty()){
-			int u = Q.front();
-			Q.pop();
+			int u = extract_min(Q);
 			for(int v = 0; v < n; v++){
 				if(adj[u][v] == 0)
 					continue;
-				if(node[v].clr == WHITE){
-					node[v].clr = GRAY;
-					node[v].d = node[u].d + 1;
+				if( (find(Q.begin(), Q.end(), &node[v]) != Q.end() ) &&
+					adj[u][v] < node[v].key){
 					node[v].pi = u;
-					Q.push(v);
+					node[v].key = adj[u][v];
 				}
 			}
-			node[u].clr = BLACK;
 		}
 	}
+
+	int extract_min(list< Node * > &Q){
+		list< Node * > :: iterator minIter, iter;
+		minIter = Q.begin();
+		for(iter = Q.begin(); iter != Q.end(); iter++){
+			if((*iter)->key < (*minIter)->key)
+				minIter = iter;
+		}
+		int id = (*minIter)->id;
+		Q.erase(minIter);
+		return id;
+	}
+
+
 	void clean(){
 		delete [] node;
 
@@ -83,21 +96,22 @@ public:
 		}
 	}
 	void print(){
-		for(int i = 0; i < n; i++)
+		for(int i = 0; i < n; i++){
 			cout<<"node: "<<i<<"\t"
-				<<"Color: "<<node[i].clr<<"\t"
-				<<"d: "<<node[i].d<<"\t"
+				<<"key: "<<node[i].key<<"\t"
 				<<"pi: "<<node[i].pi<<endl;
+		}
 	}
 };
 
 
 int main(int argc, char const *argv[])
 {
-	BFS b;
-	b.init();
-	b.bfs(1);
-	b.print();
-	b.clean();
+	Prim p;
+	p.init();
+	p.prim(0);
+	//p.print_adj();
+	p.print();
+	p.clean();
 	return 0;
 }
