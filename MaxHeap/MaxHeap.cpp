@@ -19,14 +19,15 @@ void max_heapify(int *a, int i, int heap_size){
 	}
 }
 
-void build_max_heap(int *a, int len, int &heap_size){
-	heap_size = len;
+void build_max_heap(int *a, int len){
+	int heap_size = len;
 	for(int i = len/2; i >= 1; i--)
 		max_heapify(a, i, heap_size);
 }
 
-void heap_sort(int *a, int len, int &heap_size){
-	build_max_heap(a, len, heap_size);
+void heap_sort(int *a, int len){
+	int heap_size = len;
+	build_max_heap(a, len);
 	for(int i = len; i >= 2; i--){
 		int t = a[i];
 		a[i] = a[1];
@@ -47,8 +48,7 @@ int main(int argc, char const *argv[])
 {
 	int a[] = {-1,21,3,1,2,42,5,12,56};
 	int len = 8;
-	int heap_size;
-	heap_sort(a, len, heap_size);
+	heap_sort(a, len);
 
 	print(a, len);
 	return 0;
